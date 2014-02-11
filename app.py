@@ -219,8 +219,12 @@ def api_bbc_load():
 	collection = connection['ukflood'].BBCTravelItems
 	for county in BBC_COUNTIES:
 		u = BBC_TRAVEL + county + "/roads/unplanned.json"
-		req = requests.get(u)
-		j = req.json()
+		try:
+			req = requests.get(u)
+			j = req.json()
+		except:
+			print "Apparently, %s doesn't have any roads.. "% county
+			continue
 		items = j['items']['features']
 		for item in items:
 			bti = collection.BBCTravelItem()
