@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, escape
+from haversine import distance as hdist
 import json
 from bson.objectid import ObjectId
 import datetime
@@ -53,6 +54,24 @@ def api_marker_list():
 		if '_id' in point:
 			point['_id'] = str(point['_id'])
 	return jsonify(pins=all_points)
+
+@app.route("/api/marker/radius")
+def api_marker_radius():
+	radius = float(request.args.get('radius'))
+	my_latitude = float(request.args.get('my_latitude'))
+	my_longitude = float(request.args.get('my_longitude'))
+	
+	collection = connection['ukflood'].FloodClosures
+	all_points = list(collection.find())
+	relevant_points = []
+	for point in all_points:
+		if '_id' in point:
+			point['_id'] = str(point['_id'])
+		distance_from_user = hdist((point['latitude'], point['longitude']), (my_latitude, my_longitude))
+		if distance_from_user <= radius:
+			relevant_points.append(point)	
+	return jsonify(pins=relevant_points)	
+	
 
 @app.route("/")
 def index():

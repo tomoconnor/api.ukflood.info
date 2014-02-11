@@ -112,6 +112,8 @@ $(document).ready(function() {
 // is probably because you have denied permission for location sharing.
 
 var map;
+var my_latitude;
+var my_longitude;
 
 function initialize() {
   var mapOptions = {
@@ -123,9 +125,29 @@ function initialize() {
   // Try HTML5 geolocation
   if(navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
+/////////
+	my_latitude = position.coords.latitude;
+	my_longitude = position.coords.longitude;
+	$.getJSON("/api/marker/radius", {my_latitude: my_latitude, my_longitude: my_longitude, radius: 50}, 
+		function(data){
+		$.each(data.pins, function(index,value){
+		    var pin_lat = value.latitude;
+		    var pin_long = value.longitude;
+		    var pin_pos = new google.maps.LatLng(pin_lat,pin_long);
+		    var marker = new google.maps.Marker({
+			position: pin_pos, 
+			map: map
+			// todo add a custom image here.
+		    });
+
+		});	
+
+		}
+	);
+			
       var pos = new google.maps.LatLng(position.coords.latitude,
                                        position.coords.longitude);
-
+      
       var infowindow = new google.maps.InfoWindow({
         map: map,
         position: pos,
@@ -161,6 +183,7 @@ function api_new_marker(_lat, _long) {
 function placeMarker(location) {
     var marker = new google.maps.Marker({
 	position: location, 
+	icon: "http://maps.google.com/mapfiles/marker_green.png",
 	map: map
     });
     api_new_marker(location.lat(), location.lng());
