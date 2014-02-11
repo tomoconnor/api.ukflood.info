@@ -232,7 +232,7 @@ def index():
         return render_template("layout.html")
 
 @app.route("/bbc")
-def index():
+def bbc_view():
         return render_template("bbc.html")
 
 
