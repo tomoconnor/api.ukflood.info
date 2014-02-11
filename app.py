@@ -217,7 +217,7 @@ def index():
 @app.route("/api/bbc/load")
 def api_bbc_load():
 	collection = connection['ukflood'].BBCTravelItems
-	for county in BBC_COUNTIES[0:2]:
+	for county in BBC_COUNTIES:
 		u = BBC_TRAVEL + county + "/roads/unplanned.json"
 		req = requests.get(u)
 		j = req.json()
