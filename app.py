@@ -280,5 +280,5 @@ def api_bbc_load():
 	return jsonify(result="Done")
 		
 if __name__ == '__main__':
-        app.run(host='0.0.0.0', port=BIND_PORT)
+        app.run(host=BIND_HOST, port=BIND_PORT)
 
