@@ -229,7 +229,11 @@ def api_bbc_load():
 			bti.severity = unicode(item['properties']['tpegMessage']['road_traffic_message']['@severity_factor'])
 			bti.title = unicode(item['properties']['tpegMessage']['title'])
 			bti.summary = unicode(item['properties']['tpegMessage']['summary']['$'])
-			bti.root_cause  = unicode(item['properties']['tpegMessage']['road_traffic_message']['obstructions']['object']['object_problem']['@object_problem'])
+			if "obstructions" in item['properties']['tpegMessage']['road_traffic_message']:
+				bti.root_cause  = unicode(item['properties']['tpegMessage']['road_traffic_message']['obstructions']['object']['object_problem']['@object_problem'])
+			elif "accidents" in item['properties']['tpegMessage']['road_traffic_message']:
+				bti.root_cause  = unicode(item['properties']['tpegMessage']['road_traffic_message']['accidents']['vehicles']['vehicle_problem']['@vehicle_problem'])
+
 			bti.object_blob = unicode(json.dumps(item))	
 			mgt = item['properties']['tpegMessage']['road_traffic_message']['@message_generation_time']
 			start_time = item['properties']['tpegMessage']['road_traffic_message']['@start_time']
