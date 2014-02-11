@@ -231,10 +231,10 @@ def api_bbc_load():
 			bti.summary = unicode(item['properties']['tpegMessage']['summary']['$'])
 			if "obstructions" in item['properties']['tpegMessage']['road_traffic_message']:
 				bti.root_cause  = unicode(item['properties']['tpegMessage']['road_traffic_message']['obstructions']['object']['object_problem']['@object_problem'])
-			elif "vehicles" not in item['properties']['tpegMessage']['road_traffic_message']['accidents']:
-				bti.root_cause = u"Unknown"
-			elif "accidents" in item['properties']['tpegMessage']['road_traffic_message']:
-				bti.root_cause  = unicode(item['properties']['tpegMessage']['road_traffic_message']['accidents']['vehicles']['vehicle_problem']['@vehicle_problem'])
+			#elif "vehicles" not in item['properties']['tpegMessage']['road_traffic_message']['accidents']:
+			#	bti.root_cause = u"Unknown"
+			#elif "accidents" in item['properties']['tpegMessage']['road_traffic_message']:
+			#	bti.root_cause  = unicode(item['properties']['tpegMessage']['road_traffic_message']['accidents']['vehicles']['vehicle_problem']['@vehicle_problem'])
 			else:
 				bti.root_cause = u"Unknown"
 
