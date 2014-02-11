@@ -7,8 +7,10 @@ from haversine import RADIUS_OF_EARTH
 import json
 from bson.objectid import ObjectId
 import datetime
+import time
 from config import *
 from mongokit import Connection, Document
+import requests
 
 
 #import logging
@@ -60,8 +62,30 @@ class User(Document):
 	def __repr__(self):
 		return "<User %s>" % self.screen_name
 
+class BBCTravelItem(Document):
+	structure = {
+		'latitude': float,
+		'longitude': float,
+		'owner': unicode,
+		'severity': unicode,
+		'title': unicode,
+		'summary': unicode,
+		'root_cause': unicode,
+		'object_blob': unicode,
+		'creation_time': datetime.datetime,
+		'import_time': datetime.datetime,
+		'start_time': datetime.datetime,
+		'stop_time': datetime.datetime
+		}
+	use_dot_notation = True
+	def __repr__(self):
+		return "<BBCTravelItem (%s,%s)" % (self.latitude, self.longitude)
+
+
+		
 connection.register([User])
 connection.register([FloodClosure])
+connection.register([BBCTravelItem])
 
 @app.context_processor
 def inject_values():
@@ -189,8 +213,33 @@ def api_config_radius():
 def index():
         return render_template("layout.html")
 
-
-
+@app.route("/api/bbc/load")
+def api_bbc_load():
+	collection = connection['ukflood'].BBCTravelItems
+	for county in BBC_COUNTIES[0:2]:
+		u = BBC_TRAVEL + county + "/roads/unplanned.json"
+		req = requests.get(u)
+		j = req.json()
+		items = j['items']['features']
+		for item in items:
+			bti = collection.BBCTravelItem()
+			bti.latitude = float(item['geometry']['coordinates'][0])
+			bti.longitude = float(item['geometry']['coordinates'][1])
+			bti.owner = unicode(item['properties']['tpegMessage']['originator']['@originator_name'])
+			bti.severity = unicode(item['properties']['tpegMessage']['road_traffic_message']['@severity_factor'])
+			bti.title = unicode(item['properties']['tpegMessage']['title'])
+			bti.summary = unicode(summary = item['properties']['tpegMessage']['summary']['$'])
+			bti.root_cause  = unicode(item['properties']['tpegMessage']['road_traffic_message']['obstructions']['object']['object_problem']['@object_problem'])
+			bti.object_blob = unicode(json.dumps(item))	
+			mgt = item['properties']['tpegMessage']['road_traffic_message']['@message_generation_time']
+			start_time = item['properties']['tpegMessage']['road_traffic_message']['@start_time']
+			stop_time = item['properties']['tpegMessage']['road_traffic_message']['@stop_time'] 	
+			bti.creation_time = datetime.datetime.fromtimestamp(time.mktime(time.strptime(mgt,"%Y-%m-%dT%H:%M:%SZ")))
+			bti.start_time = datetime.datetime.fromtimestamp(time.mktime(time.strptime(start_time,"%Y-%m-%dT%H:%M:%SZ")))
+			bti.stop_time = datetime.datetime.fromtimestamp(time.mktime(time.strptime(stop_time,"%Y-%m-%dT%H:%M:%SZ")))
+			bti.save()
+	return jsonify(result="Done")
+		
 if __name__ == '__main__':
         app.run(host='0.0.0.0', port=BIND_PORT)
 

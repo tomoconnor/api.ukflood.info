@@ -1,0 +1,5 @@
+flask
+flask_oauth
+Flask-Mobility
+mongokit
+requests
