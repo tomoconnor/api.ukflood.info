@@ -1,0 +1,4 @@
+SECRET_KEY="^8c(3,BMwK}(?[xFkz-B5cg7y.&r@N!3"
+BIND_PORT=8888
+MONGODB_HOST = 'localhost'
+MONGODB_PORT = 27017
