@@ -156,7 +156,8 @@ function initialize() {
 			map: map
 		    });
 		    var infoWindow = new google.maps.InfoWindow({
-			content: "<div class='infobox_content'>" + value.owner + "</div>",
+			content: "<div class='infobox_content'>" + "<p>" + value.owner +"</p>"+  "<p>" + value.severity + "</p>" + "<p>" + value.title + "</p>" +"</div>",
+ 
 			position: pin_pos
 			});
 
