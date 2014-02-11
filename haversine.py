@@ -1,9 +1,9 @@
 import math
-
+RADIUS_OF_EARTH=6371
 def distance(origin, destination):
     lat1, lon1 = origin
     lat2, lon2 = destination
-    radius = 6371 # km
+    radius = RADIUS_OF_EARTH # km
 
     dlat = math.radians(lat2-lat1)
     dlon = math.radians(lon2-lon1)

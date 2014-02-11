@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="shortcut icon" href="../../assets/ico/favicon.ico">
+    <link rel="shortcut icon" href="/static/img/favicon.ico">
 
     <title>UK Flood Mapping</title>
 
@@ -28,6 +28,9 @@
         margin: 0px;
         padding: 0px
       }
+     .infobox_content {
+	color:black;
+	}
     </style>
  
   </head>
@@ -44,18 +47,15 @@
             <span class="icon-bar"></span>
           </button>
           <a class="navbar-brand" href="#">UKFlood.info</a>
-        </div>
-       <!-- <div class="navbar-collapse collapse">
-          <form class="navbar-form navbar-right" role="form">
-            <div class="form-group">
-              <input type="text" placeholder="Email" class="form-control">
-            </div>
-            <div class="form-group">
-              <input type="password" placeholder="Password" class="form-control">
-            </div>
-            <button type="submit" class="btn btn-success">Sign in</button>
-          </form>
-        </div> --> <!--/.navbar-collapse -->
+	  </div>
+        <div class="navbar-collapse collapse">
+{% if session['user_id'] %}
+<ul class="nav navbar-nav">
+<li class="">	<a href="{{url_for('logout')}}">Logout {{session['user_id']}}</a></li>
+</ul>
+	{% endif %}
+
+       </div> <!--/.navbar-collapse -->
       </div>
     </div>
 
@@ -63,8 +63,12 @@
     <div class="jumbotron">
       <div class="container">
         <h1>Crowdsourced flood updates</h1>
-	<p>Sign in with twitter and get mapping</p>
-        <p><a class="btn btn-primary btn-lg" role="button">Sign in&raquo;</a></p>
+	{% if session['user_id'] %}
+		<p>Get mapping!</p>
+	{% else %}
+		<p>Sign in with twitter and get mapping</p>
+		<p><a class="btn btn-primary btn-lg" role="button" href="{{url_for('login')}}">Sign in&raquo;</a></p>
+	{% endif %}
       </div>
     </div>
 
@@ -79,7 +83,11 @@
         </div>
         <div class="col-md-8">
           <h2>Flood Map</h2>
+	{% if not request.MOBILE %}
 	<p>Right-click to add a pin where there's a flood</p>
+	{% else %}
+	<p>Click to add a pin where there's a flood</p>
+	{% endif %}
 	  <p><a class="btn btn-default" href="#" role="button" id="show_all">Show All &raquo;</a></p>
 <div id="map-canvas" style="width: 100%; height: 400px"></div>
 
@@ -108,24 +116,53 @@
     <script src="//maps.googleapis.com/maps/api/js?key=AIzaSyCwUgkELk3I4MrFeiyInr3bHbvj5zNeXB8&sensor=true&v=3.exp"></script>
 
 <script src="/static/js/detectmobile.js"></script>
+<script>
+$("#show_all").bind('click', function(){
+	$.post("/api/config/radius_of_concern", {"new_value": 0}, function(data){
+		console.log(data);
+var birmingham = new google.maps.LatLng(52.456009, -1.867676);
+ var mapOptions = {
+    zoom: 6,
+    center: birmingham
+  };
+
+	var  map = new google.maps.Map(document.getElementById('map-canvas'),
+      mapOptions);
+
+
+		$.getJSON("/api/marker/radius" ,{my_latitude: 52, my_longitude: -1, radius: data.radius_of_concern },
+		function(data){
+		$.each(data.pins, function(index,value){
+		    var pin_lat = value.latitude;
+		    var pin_long = value.longitude;
+		    var pin_pos = new google.maps.LatLng(pin_lat,pin_long);
+		    var marker = new google.maps.Marker({
+			position: pin_pos, 
+			icon: "/static/img/river-2.png",
+			map: map
+		    });
+		    var infoWindow = new google.maps.InfoWindow({
+			content: "<div class='infobox_content'>" + value.owner + "</div>",
+			position: pin_pos
+			});
+
+		   google.maps.event.addListener(marker, 'click', function(){
+			   infoWindow.open(map);
+			   map.setCenter(pin_pos);
+			   });
+
+		});	
+
+		}
+	);
+	});
+});
+
+</script>
  <script>
 var map;
 var initialLocation;
 var birmingham = new google.maps.LatLng(52.456009, -1.867676);
-//
-//function handleNoGeolocation(map,errorFlag) {
-//
-//    if (errorFlag == true) {
-//      alert("Geolocation service failed.");
-//      initialLocation = birmingham;
-//    } else {
-//      alert("Your browser doesn't support geolocation. We've placed you in Siberia.");
-//      initialLocation = birmingham;
-//    }
-//    map.setCenter(initialLocation);
-//  }
-//
-//
 $(document).ready(function() {
 // Note: This example requires that you consent to location sharing when
 // prompted by your browser. If you see a blank space instead of the map, this
@@ -150,7 +187,7 @@ function initialize() {
 /////////
 	my_latitude = position.coords.latitude;
 	my_longitude = position.coords.longitude;
-	$.getJSON("/api/marker/radius", {my_latitude: my_latitude, my_longitude: my_longitude, radius: 50}, 
+	$.getJSON("/api/marker/radius", {my_latitude: my_latitude, my_longitude: my_longitude, radius: {{radius_of_concern}}}, 
 		function(data){
 		$.each(data.pins, function(index,value){
 		    var pin_lat = value.latitude;
@@ -161,6 +198,15 @@ function initialize() {
 			icon: "/static/img/river-2.png",
 			map: map
 		    });
+		    var infoWindow = new google.maps.InfoWindow({
+			content: "<div class='infobox_content'>" + value.owner + "</div>",
+			position: pin_pos
+			});
+
+		   google.maps.event.addListener(marker, 'click', function(){
+			   infoWindow.open(map);
+			   map.setCenter(pin_pos);
+			   });
 
 		});	
 
@@ -187,28 +233,32 @@ function initialize() {
 
 if ($.browser.mobile) {
 
-google.maps.event.addListener(map, 'mousedown', function(event) {
+var mobile_mousedown = google.maps.event.addListener(map, 'mousedown', function(event) {
 
   var initPoint = {x: event.pageX, y: event.pageY}, 
       toBeCanceled = false, 
       latLong = event.latLong;
 
-    google.maps.event.addListener(map, 'mousemove', function(event) {
+   var mobile_mousemove =  google.maps.event.addListener(map, 'mousemove', function(event) {
        var newPoint = {x: event.pageX, y: event.pageY};
 
        // if newPoint has moved beyond expected limits
        toBeCanceled = true
     });  
 
-    google.maps.event.addListener(map, 'mouseup', function(event) {
+    var mobile_mouseup = google.maps.event.addListener(map, 'mouseup', function(event) {
 
       if (toBeCanceled) {
-        event.preventDefault()
+        event.stop()
       } else {
         placeMarker(event.latLng);
       }
 
       // Unregister mousemove and mouseup
+      google.maps.event.removeListener(mobile_mouseup);
+      google.maps.event.removeListener(mobile_mousemove);
+
+	
     });
 
 });
