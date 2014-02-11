@@ -16,6 +16,14 @@ app.secret_key = SECRET_KEY
 connection = Connection(MONGODB_HOST, MONGODB_PORT)
 
 
+def get_active_users():
+	return []	
+@app.context_processor
+def inject_values():
+	return dict(
+	active_users = get_active_users()
+	)
+
 class FloodClosure(Document):
 	structure = {
 		'owner': unicode,
