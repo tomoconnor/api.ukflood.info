@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, escape, g
+import re
 from flask.ext.mobility import Mobility
 from flask_oauth import OAuth
 
@@ -19,7 +20,7 @@ app = Flask(__name__)
 Mobility(app)
 app.debug= True
 app.secret_key = SECRET_KEY
-
+flood_match  = re.compile(r'flood', re.I|re.M)
 connection = Connection(MONGODB_HOST, MONGODB_PORT)
 
 oauth = OAuth()
@@ -248,7 +249,8 @@ def api_bbc_load():
 			bti.creation_time = datetime.datetime.fromtimestamp(time.mktime(time.strptime(mgt,"%Y-%m-%dT%H:%M:%SZ")))
 			bti.start_time = datetime.datetime.fromtimestamp(time.mktime(time.strptime(start_time,"%Y-%m-%dT%H:%M:%SZ")))
 			bti.stop_time = datetime.datetime.fromtimestamp(time.mktime(time.strptime(stop_time,"%Y-%m-%dT%H:%M:%SZ")))
-			bti.save()
+			if flood_match.search(bti.root_cause.lower()):
+				bti.save()
 	return jsonify(result="Done")
 		
 if __name__ == '__main__':
