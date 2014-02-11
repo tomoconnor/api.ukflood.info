@@ -250,8 +250,8 @@ def api_bbc_load():
 		items = j['items']['features']
 		for item in items:
 			bti = collection.BBCTravelItem()
-			bti.latitude = float(item['geometry']['coordinates'][0])
-			bti.longitude = float(item['geometry']['coordinates'][1])
+			bti.latitude = float(item['geometry']['coordinates'][1])
+			bti.longitude = float(item['geometry']['coordinates'][0])
 			bti.owner = unicode(item['properties']['tpegMessage']['originator']['@originator_name'])
 			bti.severity = unicode(item['properties']['tpegMessage']['road_traffic_message']['@severity_factor'])
 			bti.title = unicode(item['properties']['tpegMessage']['title'])
