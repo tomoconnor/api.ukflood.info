@@ -228,7 +228,7 @@ def api_bbc_load():
 			bti.owner = unicode(item['properties']['tpegMessage']['originator']['@originator_name'])
 			bti.severity = unicode(item['properties']['tpegMessage']['road_traffic_message']['@severity_factor'])
 			bti.title = unicode(item['properties']['tpegMessage']['title'])
-			bti.summary = unicode(summary = item['properties']['tpegMessage']['summary']['$'])
+			bti.summary = unicode(item['properties']['tpegMessage']['summary']['$'])
 			bti.root_cause  = unicode(item['properties']['tpegMessage']['road_traffic_message']['obstructions']['object']['object_problem']['@object_problem'])
 			bti.object_blob = unicode(json.dumps(item))	
 			mgt = item['properties']['tpegMessage']['road_traffic_message']['@message_generation_time']
