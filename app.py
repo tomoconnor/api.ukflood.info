@@ -235,6 +235,9 @@ def api_bbc_load():
 				bti.root_cause  = unicode(item['properties']['tpegMessage']['road_traffic_message']['accidents']['vehicles']['vehicle_problem']['@vehicle_problem'])
 			elif "vehicles" not in item['properties']['tpegMessage']['road_traffic_message']['accidents']:
 				bti.root_cause = u"Unknown"
+			else:
+				bti.root_cause = u"Unknown"
+
 			bti.object_blob = unicode(json.dumps(item))	
 			mgt = item['properties']['tpegMessage']['road_traffic_message']['@message_generation_time']
 			start_time = item['properties']['tpegMessage']['road_traffic_message']['@start_time']
