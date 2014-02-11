@@ -104,8 +104,26 @@
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
     <script src="//maps.googleapis.com/maps/api/js?key=AIzaSyCwUgkELk3I4MrFeiyInr3bHbvj5zNeXB8&sensor=true&v=3.exp"></script>
+
+<script src="/static/js/detectmobile.js"></script>
  <script>
 var map;
+var initialLocation;
+var birmingham = new google.maps.LatLng(52.456009, -1.867676);
+//
+//function handleNoGeolocation(map,errorFlag) {
+//
+//    if (errorFlag == true) {
+//      alert("Geolocation service failed.");
+//      initialLocation = birmingham;
+//    } else {
+//      alert("Your browser doesn't support geolocation. We've placed you in Siberia.");
+//      initialLocation = birmingham;
+//    }
+//    map.setCenter(initialLocation);
+//  }
+//
+//
 $(document).ready(function() {
 // Note: This example requires that you consent to location sharing when
 // prompted by your browser. If you see a blank space instead of the map, this
@@ -117,10 +135,12 @@ var my_longitude;
 
 function initialize() {
   var mapOptions = {
-    zoom: 15
+    zoom: 15,
+    center: birmingham
   };
   map = new google.maps.Map(document.getElementById('map-canvas'),
       mapOptions);
+
 
   // Try HTML5 geolocation
   if(navigator.geolocation) {
@@ -136,8 +156,8 @@ function initialize() {
 		    var pin_pos = new google.maps.LatLng(pin_lat,pin_long);
 		    var marker = new google.maps.Marker({
 			position: pin_pos, 
+			icon: "/static/img/river-2.png",
 			map: map
-			// todo add a custom image here.
 		    });
 
 		});	
@@ -148,11 +168,10 @@ function initialize() {
       var pos = new google.maps.LatLng(position.coords.latitude,
                                        position.coords.longitude);
       
-      var infowindow = new google.maps.InfoWindow({
-        map: map,
-        position: pos,
-        content: 'Location found using HTML5.'
-      });
+      //var infowindow = new google.maps.InfoWindow({
+      //  map: map,
+      //  position: pos,
+      //});
 
       map.setCenter(pos);
     }, function() {
@@ -163,15 +182,18 @@ function initialize() {
     handleNoGeolocation(false);
   }
 
+if ($.browser.mobile) {
+	google.maps.event.addListener(map, 'mousedown', function(event) {
+	   placeMarker(event.latLng);
+	});
 
-//  google.maps.event.addListener(map, 'click', function(event) {
-//   placeMarker(event.latLng);
-//});
+} else { 
 
-google.maps.event.addListener(map, 'mousedown', function(event) {
-   placeMarker(event.latLng);
-});
+  google.maps.event.addListener(map, 'click', function(event) {
+     placeMarker(event.latLng);
+  });
 
+}
 }
 
 function api_new_marker(_lat, _long) {
