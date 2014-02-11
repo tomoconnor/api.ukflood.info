@@ -200,6 +200,23 @@ def api_marker_radius():
 			relevant_points.append(point)	
 	return jsonify(pins=relevant_points)	
 	
+@app.route("/api/bbc/radius")
+def api_bbc_radius():
+	radius = float(request.args.get('radius'))
+	my_latitude = float(request.args.get('my_latitude'))
+	my_longitude = float(request.args.get('my_longitude'))
+	
+	collection = connection['ukflood'].BBCTravelItems
+	all_points = list(collection.find())
+	relevant_points = []
+	for point in all_points:
+		if '_id' in point:
+			point['_id'] = str(point['_id'])
+		distance_from_user = hdist((point['latitude'], point['longitude']), (my_latitude, my_longitude))
+		if distance_from_user <= radius:
+			relevant_points.append(point)	
+	return jsonify(pins=relevant_points)	
+	
 
 @app.route("/api/config/radius_of_concern", methods=['POST'])
 def api_config_radius():
@@ -213,6 +230,11 @@ def api_config_radius():
 @app.route("/")
 def index():
         return render_template("layout.html")
+
+@app.route("/bbc")
+def index():
+        return render_template("bbc.html")
+
 
 @app.route("/api/bbc/load")
 def api_bbc_load():
