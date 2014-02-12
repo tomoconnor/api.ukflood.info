@@ -46,7 +46,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">UKFlood.info</a>
+          <a class="navbar-brand" href="/">UKFlood.info</a>
 	  </div>
         <div class="navbar-collapse collapse">
 {% if session['user_id'] %}
@@ -76,12 +76,7 @@
       <!-- Example row of columns -->
       <div class="row">
       <div class="col-md-12">
-          <h2>Flood Map</h2>
-	{% if not request.MOBILE %}
-	<p>Right-click to add a pin where there's a flood</p>
-	{% else %}
-	<p>Click to add a pin where there's a flood</p>
-	{% endif %}
+          <h2>BBC Travel Alerts Flood Map</h2>
 	  <p><a class="btn btn-default" href="#" role="button" id="show_all">Show All &raquo;</a></p>
 <div id="map-canvas" style="width: 100%; height: 600px"></div>
 
