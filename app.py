@@ -238,6 +238,7 @@ def bbc_view():
 
 @app.route("/api/bbc/load")
 def api_bbc_load():
+	connection.ukflood.drop_collection("BBCTravelItems")
 	collection = connection['ukflood'].BBCTravelItems
 	for county in BBC_COUNTIES:
 		u = BBC_TRAVEL + county + "/roads/unplanned.json"
