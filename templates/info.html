@@ -1,0 +1,20 @@
+<h3>Information</h3>
+<p>
+Crowd-sourcing is the best way to gather information quickly.
+</p>
+<p>
+{% if request.MOBILE %}
+Just click the map to mark where floodwaters are.
+Your mobile device will report it's current location to the map, which will be centred where you are.
+{% else %}
+Just right-click the map to mark where floodwaters are.
+Your device will report it's current location to the map, which will be centred where you are.
+{% endif %}
+</p>
+<p>
+Your map marker will be stored by the server, next to your username (if you're signed in).</p>
+<p>
+If you're not signed in, your map marker will be stored as "Anonymous", and may be deleted if it has not been verified. </p>
+<p><strong>
+Floodwaters are dangerous.  Do not risk your life to explore flooded areas.</strong></p>
+

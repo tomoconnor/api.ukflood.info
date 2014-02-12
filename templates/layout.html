@@ -58,20 +58,7 @@
        </div> <!--/.navbar-collapse -->
       </div>
     </div>
-
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron">
-      <div class="container">
-        <h1>Crowdsourced flood updates</h1>
-	{% if session['user_id'] %}
-		<p>Get mapping!</p>
-	{% else %}
-		<p>Sign in with twitter and get mapping</p>
-		<p><a class="btn btn-primary btn-lg" role="button" href="{{url_for('login')}}">Sign in&raquo;</a></p>
-	{% endif %}
-      </div>
-    </div>
-
+	{% include "jumbotron.html" %}
     <div class="container">
       <!-- Example row of columns -->
       <div class="row">
