@@ -13,12 +13,30 @@ from config import *
 from mongokit import Connection, Document
 import requests
 
-
-#import logging
-#logging.basicConfig(format='%(levelname)s:%(message)s',level=logging.INFO)
 app = Flask(__name__)
 Mobility(app)
-app.debug= False
+
+app.debug=False
+
+if not app.debug:
+	import logging
+	from logging.handlers import TimedRotatingFileHandler
+	from logging import Formatter
+	file_handler = TimedRotatingFileHandler(filename="/home/ubuntu/api.ukflood.info/flask_production.log", when='D', interval=1, utc=True,)
+	file_handler.setFormatter(Formatter('''
+	Message type:       %(levelname)s
+	Location:           %(pathname)s:%(lineno)d
+	Module:             %(module)s
+	Function:           %(funcName)s
+	Time:               %(asctime)s
+	
+	Message:
+	
+	%(message)s
+	'''
+	file_handler.setLevel(logging.INFO)
+	app.logger.addHandler(file_handler)
+
 app.secret_key = SECRET_KEY
 flood_match  = re.compile(r'flood', re.I|re.M)
 connection = Connection(MONGODB_HOST, MONGODB_PORT)
