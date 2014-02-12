@@ -185,6 +185,52 @@ google.maps.event.addDomListener(window, 'load', initialize);
 });
 
     </script>
+
+
+<script>
+$("#show_all").bind('click', function(){
+	$.post("/api/config/radius_of_concern", {"new_value": 0}, function(data){
+		console.log(data);
+var birmingham = new google.maps.LatLng(52.456009, -1.867676);
+ var mapOptions = {
+    zoom: 6,
+    center: birmingham
+  };
+
+	var  map = new google.maps.Map(document.getElementById('map-canvas'),
+      mapOptions);
+
+
+		$.getJSON("/api/bbc/radius" ,{my_latitude: 52, my_longitude: -1, radius: data.radius_of_concern },
+		function(data){
+		$.each(data.pins, function(index,value){
+		    var pin_lat = value.latitude;
+		    var pin_long = value.longitude;
+		    var pin_pos = new google.maps.LatLng(pin_lat,pin_long);
+		    var marker = new google.maps.Marker({
+			position: pin_pos, 
+			icon: "/static/img/river-2.png",
+			map: map
+		    });
+		    var infoWindow = new google.maps.InfoWindow({
+			content: "<div class='infobox_content'>" + "<p>" + value.owner +"</p>"+  "<p>Cause: " + value.root_cause+ "</p>"  + "<p>Severity: " + value.severity + "</p>" + "<p>" + value.summary + "</p>" +"</div>",
+ 
+			position: pin_pos
+			});
+
+		   google.maps.event.addListener(marker, 'click', function(){
+			   infoWindow.open(map);
+			   map.setCenter(pin_pos);
+			   });
+
+		});	
+		}
+	);
+	});
+});
+
+</script>
+
  {% include "gosquared.html" %}
  </body>
 </html>
