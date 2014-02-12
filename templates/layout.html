@@ -188,7 +188,7 @@ function initialize() {
 			map: map
 		    });
         window.markers[value._id] = marker;
-        
+       
 		    var infoWindow = new google.maps.InfoWindow({
 			content: "<div class='infobox_content'>" + value.owner + "</div>",
 			position: pin_pos
@@ -268,6 +268,18 @@ var mobile_mousedown = google.maps.event.addListener(map, 'mousedown', function(
 function api_new_marker(_lat, _long) {
  $.post("/api/marker/new",{lat: _lat, long: _long}).done( function (data) {
   console.log(data);
+
+   // Dynamic Update Mypins
+
+        var mypin_source = $("#mypin_template").html();
+        var mypin_template = Handlebars.compile(mypin_source);
+
+        var context = {latitude: _lat.toFixed(4), 
+                      longitude: _long.toFixed(4), 
+                      id: data.marker._id};
+        $("#my_pins").append(mypin_template(context));
+        localStorage.setItem(data.marker._id, JSON.stringify(data.marker));
+        // End
  });
 }
 

@@ -17,7 +17,7 @@ import requests
 app = Flask(__name__)
 Mobility(app)
 
-app.debug=True
+app.debug=False
 
 import logging
 from logging.handlers import TimedRotatingFileHandler
@@ -195,7 +195,9 @@ def api_marker_new():
 		fc.longitude = float(longitude)
 		fc.creation_date = datetime.datetime.now()
 		fc.save()
-		return jsonify(message="Flooded Area added")
+		marker = fc
+		marker['_id'] = str(marker['_id'])
+		return jsonify(message="Flooded Area added", new_id=str(fc._id), marker=marker)
 	else:
 		return jsonify(result=0)
 
