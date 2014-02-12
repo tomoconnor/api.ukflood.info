@@ -64,7 +64,8 @@
       <div class="row">
         <div class="col-md-10">
           <h2>Flood Map</h2>
-	{% include "sharing.html" %}	
+          {% include "sharing.html" %}
+	<!-- Sharing -->	
 	{% if not request.MOBILE %}
 	<p>Right-click to add a pin where there's a flood</p>
 	{% else %}
@@ -152,6 +153,8 @@ var map;
 var initialLocation;
 var birmingham = new google.maps.LatLng(52.456009, -1.867676);
 $(document).ready(function() {
+
+
 // Note: This example requires that you consent to location sharing when
 // prompted by your browser. If you see a blank space instead of the map, this
 // is probably because you have denied permission for location sharing.
@@ -222,7 +225,10 @@ function initialize() {
   }
 
 
-if ($.browser.mobile) {
+var iOS = ( navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false );
+
+if ($.browser.mobile || iOS) {
+
 
 var mobile_mousedown = google.maps.event.addListener(map, 'mousedown', function(event) {
 
