@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:fb="http://ogp.me/ns/fb#">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="/static/img/favicon.ico">
+
+    <title>UK Flood Cleanup Mapping</title>
+
+    <!-- Bootstrap core CSS -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootswatch/3.1.0/superhero/bootstrap.min.css">
+
+    <!-- Custom styles for this template -->
+
+    <!-- Just for debugging purposes. Don't actually copy this line! -->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+     .infobox_content {
+	color:black;
+	}
+    </style>
+ 
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">UKFlood.info</a>
+	  </div>
+        <div class="navbar-collapse collapse">
+{% if session['user_id'] %}
+<ul class="nav navbar-nav">
+<li class="">	<a href="{{url_for('logout')}}">Logout {{session['user_id']}}</a></li>
+</ul>
+	{% endif %}
+
+       </div> <!--/.navbar-collapse -->
+      </div>
+    </div>
+	{% include "jumbotron.html" %}
+    <div class="container">
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="col-md-10">
+          <h2>Coming Soon</h2>
+	<p>Crowd-sourced cleanup effort and online coordination</p>
+	{% include "sharing.html" %}	
+       </div>
+        <div class="col-md-2">
+          <h2>Other Maps</h2>
+		<p><a href="/">Crowdsourced Flood Map</a></p>
+		<p><a href="/bbc">BBC Travel Alert Data</a></p>
+        </div>
+      </div>
+	<div class="row">
+	<div class="col-md-2">&nbsp;</div>
+	<div class="col-md-8">
+	</div>
+	<div class="col-md-2">&nbsp;</div>
+	</div>
+      <hr>
+
+      <footer>
+        <p>Built by <a href="http://twitter.com/devopstom">@devopstom</a></p>
+      </footer>
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+    <script src="//maps.googleapis.com/maps/api/js?key=AIzaSyCwUgkELk3I4MrFeiyInr3bHbvj5zNeXB8&sensor=true&v=3.exp"></script>
+
+<script src="/static/js/detectmobile.js"></script>
+ {% include "gosquared.html" %}
+ </body>
+</html>
+
+

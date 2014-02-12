@@ -255,6 +255,10 @@ def index():
 def bbc_view():
         return render_template("bbc.html")
 
+@app.route("/cleanup")
+def cleanup_view():
+	return render_template("cleanup.html")
+
 @app.errorhandler(404)
 def page_not_found(e):
 	return render_template("404.html"), 404
