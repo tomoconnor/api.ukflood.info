@@ -154,7 +154,9 @@ def oauth_authorized(resp):
 		return redirect(next_url)
 
 def get_active_users():
-	return ['devopstom']	
+	collection = connection['ukflood'].Users
+	u = collection.find(fields={'screen_name':True})
+	return list(u)
 @app.route("/api/marker/new", methods=['POST'])
 def api_marker_new():
 	if request.method == 'POST':
