@@ -4,7 +4,6 @@
         <h1>Crowdsourced flood updates</h1>
 	{% if session['user_id'] %}
 		<p>Get mapping!</p>
-		{% include "info.html" %}
 	{% else %}
 		<p><a class="btn btn-primary btn-lg" role="button" href="{{url_for('login')}}">Sign in with Twitter&raquo;</a></p>
 	{% endif %}
