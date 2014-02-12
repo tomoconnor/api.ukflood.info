@@ -1,0 +1,84 @@
+<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
+
+{% raw %}
+<script id="mypin_template" type="text/x-handlebars-template">
+  <li id="li_{{id}}">
+    <button id="{{id}}" class="centre_my_pin btn btn-success">({{latitude}},{{longitude}})</button>
+    <br />
+    <button href="" id="{{id}}" class="delete_my_pin btn btn-danger">Delete Pin</button>
+  </li>
+</script>
+
+<script id="modal_template" type="text/x-handlebars-template">
+</script>
+{% endraw %}
+
+
+
+<script type="text/javascript">
+$(document).ready(function(){
+	var mypin_source = $("#mypin_template").html();
+	var mypin_template = Handlebars.compile(mypin_source);
+
+	$.getJSON("/api/marker/user", function(data){
+		$.each(data.pins, function(index,pin){
+			var context = {latitude: pin['latitude'].toFixed(4), longitude: pin['longitude'].toFixed(4), id: pin['_id']};
+			$("#my_pins").append(mypin_template(context));
+			localStorage.setItem(pin['_id'], JSON.stringify(pin));
+		});
+		$(document).on("click","button.centre_my_pin", function(){
+			var clicked_object = JSON.parse(localStorage.getItem(event.target.id));
+			var map_centre = new google.maps.LatLng(clicked_object.latitude,clicked_object.longitude);
+		
+			window.map.setCenter(map_centre);
+		
+
+		});
+
+
+		$(document).on("click","button.delete_my_pin", function(){
+			var clicked_object = JSON.parse(localStorage.getItem(event.target.id));
+			var map_centre = new google.maps.LatLng(clicked_object.latitude,clicked_object.longitude);
+			localStorage.setItem("requestedForDeletion", clicked_object._id);
+			window.map.setCenter(map_centre);
+			$("#confirmModal").modal('show');
+			$("#yes_im_sure").bind("click", function(){
+				var delete_id = localStorage.getItem("requestedForDeletion"); //abusing localStorage for Fun and Profit. 
+
+				$("#confirmModal").modal('hide');
+				$.post("/api/marker/delete",{this_id: delete_id, requested_by: "{{session['user_id']}}" }).done( function (data) {
+  					console.log(data.message);
+  					var li_item_id = "#li_" + delete_id;
+  					$(li_item_id).remove(); //remove pinset from my tags
+  					window.markers[delete_id].setMap(null); // remove marker from map
+ 				});
+				
+
+			});
+		});
+	});
+
+	
+
+});
+
+</script>
+
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Are you sure?</h4>
+      </div>
+      <div class="modal-body">
+        This pin will be deleted.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="yes_im_sure">Delete!</button>
+      </div>
+    </div>
+  </div>
+</div>
+

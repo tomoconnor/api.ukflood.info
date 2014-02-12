@@ -11,19 +11,22 @@ import datetime
 import time
 from config import *
 from mongokit import Connection, Document
+
 import requests
 
 app = Flask(__name__)
 Mobility(app)
 
-app.debug=False
+app.debug=True
 
-if not app.debug:
-	import logging
-	from logging.handlers import TimedRotatingFileHandler
-	from logging import Formatter
-	file_handler = TimedRotatingFileHandler(filename="/home/ubuntu/api.ukflood.info/flask_production.log", when='D', interval=1, utc=True,)
-	file_handler.setFormatter(Formatter('''
+import logging
+from logging.handlers import TimedRotatingFileHandler
+from logging import Formatter
+if app.debug:
+	file_handler = TimedRotatingFileHandler(filename=DEV_LOGFILE, when='D', interval=1, utc=True,)
+else:
+	file_handler = TimedRotatingFileHandler(filename=PRODUCTION_LOGFILE, when='D', interval=1, utc=True,)
+file_handler.setFormatter(Formatter('''
 	Message type:       %(levelname)s
 	Location:           %(pathname)s:%(lineno)d
 	Module:             %(module)s
@@ -34,8 +37,10 @@ if not app.debug:
 	
 	%(message)s
 	'''))
-	file_handler.setLevel(logging.INFO)
-	app.logger.addHandler(file_handler)
+
+file_handler.setLevel(logging.INFO)
+
+app.logger.addHandler(file_handler)
 
 app.secret_key = SECRET_KEY
 flood_match  = re.compile(r'flood', re.I|re.M)
@@ -246,6 +251,40 @@ def api_config_radius():
 	else:
 		session['radius_of_concern'] = new_radius
 	return jsonify(radius_of_concern = session['radius_of_concern'])	
+
+@app.route("/api/marker/user")
+def api_marker_user():
+	if not session:
+		return jsonify(pins=[])
+	else:
+		username = session['user_id']
+		collection = connection['ukflood'].FloodClosures
+		all_my_points = list(collection.find({'owner':username}))
+		for point in all_my_points:
+			if '_id' in point:
+				point['_id'] = str(point['_id'])
+		return jsonify(pins=all_my_points)
+
+@app.route("/api/marker/delete", methods=['POST'])
+def delete_marker():
+	if request.method == "POST":
+		id_to_delete = request.form['this_id']
+		requesting_user = request.form['requested_by']
+		if session['user_id'] == requesting_user:
+			collection = connection['ukflood'].FloodClosures
+			obj_id = ObjectId(id_to_delete)
+			try:
+				collection.remove({'_id':obj_id})
+				msg = requesting_user.title() + " deleted item with id " + id_to_delete
+			except Exception, e:
+				msg = "Object could not be deleted. " + e.message
+			return jsonify(message=msg)
+		else:
+			msg = "You can only delete your own pins"
+			return jsonify(message=msg), 403
+
+
+
 
 @app.route("/")
 def index():

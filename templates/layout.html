@@ -76,7 +76,9 @@
        </div>
         <div class="col-md-2">
           <h2>Other Maps</h2>
-		<p><a href="/bbc">BBC Travel Alert Data</a></p>
+		      <p><a href="/bbc">BBC Travel Alert Data</a></p>
+
+          {% include "mypins.html" %}
         </div>
       </div>
 	<div class="row">
@@ -154,7 +156,6 @@ $(document).ready(function() {
 // prompted by your browser. If you see a blank space instead of the map, this
 // is probably because you have denied permission for location sharing.
 
-var map;
 var my_latitude;
 var my_longitude;
 
@@ -165,6 +166,8 @@ function initialize() {
   };
   map = new google.maps.Map(document.getElementById('map-canvas'),
       mapOptions);
+  window.map = map;
+  window.markers = {};
 
 
   // Try HTML5 geolocation
@@ -184,6 +187,8 @@ function initialize() {
 			icon: "/static/img/river-2.png",
 			map: map
 		    });
+        window.markers[value._id] = marker;
+        
 		    var infoWindow = new google.maps.InfoWindow({
 			content: "<div class='infobox_content'>" + value.owner + "</div>",
 			position: pin_pos
@@ -298,6 +303,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
 
     </script>
  {% include "gosquared.html" %}
+ {% include "handlebars.html" %}
  </body>
 </html>
 
