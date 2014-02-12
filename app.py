@@ -256,7 +256,7 @@ def api_config_radius():
 
 @app.route("/api/marker/user")
 def api_marker_user():
-	if not session:
+	if 'user_id' not in session:
 		return jsonify(pins=[])
 	else:
 		username = session['user_id']
