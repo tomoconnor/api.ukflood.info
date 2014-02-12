@@ -76,11 +76,8 @@
       <!-- Example row of columns -->
       <div class="row">
         <div class="col-md-2">
-          <h2>Active Users</h2>
-	  {% for u in active_users %}
-		<p>{{ u }}</p>
-	  {% endfor %}
-        </div>
+	{% include "active_users.html" %}
+	</div>
         <div class="col-md-8">
           <h2>Flood Map</h2>
 	{% include "sharing.html" %}	
