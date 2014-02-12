@@ -18,7 +18,7 @@ import requests
 #logging.basicConfig(format='%(levelname)s:%(message)s',level=logging.INFO)
 app = Flask(__name__)
 Mobility(app)
-app.debug= True
+app.debug= False
 app.secret_key = SECRET_KEY
 flood_match  = re.compile(r'flood', re.I|re.M)
 connection = Connection(MONGODB_HOST, MONGODB_PORT)
@@ -234,6 +234,14 @@ def index():
 @app.route("/bbc")
 def bbc_view():
         return render_template("bbc.html")
+
+@app.errorhandler(404)
+def page_not_found(e):
+	return render_template("404.html"), 404
+
+@app.errorhandler(500)
+def ISR(e):
+	return render_template("500.html"),500
 
 
 @app.route("/api/bbc/load")
