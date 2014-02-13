@@ -318,6 +318,11 @@ def admin():
 @app.route("/admin/api/user/delete", methods=['POST'])
 def admin_api_user_delete():
 	return jsonify(message="OK!")
+
+@app.route("/admin/api/flag/approve", methods=['POST'])
+def admin_api_flag_approve():
+	return jsonify(message="OK!")
+
 	
 @app.route("/admin/api/users")
 def admin_api_users():
