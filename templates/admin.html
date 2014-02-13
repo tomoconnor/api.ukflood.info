@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:fb="http://ogp.me/ns/fb#">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="shortcut icon" href="/static/img/favicon.ico">
 
-    <title>UK Flood Mapping</title>
+    <title>Administration -- UK Flood Mapping</title>
 
     <!-- Bootstrap core CSS -->
 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootswatch/3.1.0/superhero/bootstrap.min.css">
@@ -48,37 +48,30 @@
           </button>
           <a class="navbar-brand" href="#">UKFlood.info</a>
 	  </div>
-       {% include "navbar.html" %}
-
+{% include "navbar.html" %}
       </div>
     </div>
-
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron">
-      <div class="container">
-        <h1>404: Page Not Found</h1>
-      </div>
-    </div>
-
+	{% include "admin_jumbotron.html" %}
     <div class="container">
       <!-- Example row of columns -->
       <div class="row">
-        <div class="col-md-2">
-	<p>&nbsp;</p>
+        <div class="col-md-6">
+          <div id="map-canvas" style="width: 100%; height: 400px; border:1px white solid;"></div>
         </div>
-        <div class="col-md-8">
-          <h2>What you were looking for is just not there</h2>
-	 <p><a href="{{ url_for('index') }}">Go somewhere else instead</a></p>
-       </div>
-        <div class="col-md-2">
-		<p>&nbsp;</p>
+        <div class="col-md-6">
+          <h2>User Administration</h2>
+      	  <div id="user_admin"></div>
+          <hr />
+          <h2>Flag Administration</h2>
+          <div id="flag_admin"></div>
         </div>
+
       </div>
 
       <hr>
 
       <footer>
-        <p>&copy; Company 2014</p>
+        <p>Built by <a href="http://twitter.com/devopstom">@devopstom</a></p>
       </footer>
     </div> <!-- /container -->
 
@@ -87,9 +80,16 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+    <script src="//maps.googleapis.com/maps/api/js?key=AIzaSyCwUgkELk3I4MrFeiyInr3bHbvj5zNeXB8&sensor=true&v=3.exp"></script>
 
+    <script src="/static/js/detectmobile.js"></script>
+
+ {% include "admin_users.html" %}
+
+ {% include "admin_map.html" %}
  {% include "gosquared.html" %}
+
  </body>
 </html>
 

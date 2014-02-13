@@ -1,0 +1,13 @@
+<div class="navbar-collapse collapse">
+	<ul class="nav navbar-nav">
+		{% if session['user_id'] %}
+			<li class="">	<a href="{{url_for('logout')}}">Logout {{session['user_id']}}</a></li>
+
+			{% if session['user_id'] == "devopstom" %}
+				<li class=""><a href="{{url_for('admin')}}">Administration</a></li>
+			{% endif %}
+			
+		{% endif %}
+		
+	</ul>
+</div> <!--/.navbar-collapse -->

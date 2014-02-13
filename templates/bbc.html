@@ -48,14 +48,7 @@
           </button>
           <a class="navbar-brand" href="/">UKFlood.info</a>
 	  </div>
-        <div class="navbar-collapse collapse">
-{% if session['user_id'] %}
-<ul class="nav navbar-nav">
-<li class="">	<a href="{{url_for('logout')}}">Logout {{session['user_id']}}</a></li>
-</ul>
-	{% endif %}
-
-       </div> <!--/.navbar-collapse -->
+{% include "navbar.html" %}
       </div>
     </div>
 	{% include "jumbotron.html" %}

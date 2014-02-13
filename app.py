@@ -268,6 +268,12 @@ def page_not_found(e):
 def ISR(e):
 	return render_template("500.html"),500
 
+@app.route("/api/bbc/load")
+def api_bbc_load_all():
+	roads = json.loads("".join(loader_bbc_roads().response))
+	trains = json.loads("".join(loader_bbc_trains().response))
+	combined_result = dict(roads=roads, trains=trains)
+	return jsonify(result=combined_result)
 
 @app.route("/api/bbc/roads/load")
 def api_bbc_roads_load():
@@ -290,10 +296,67 @@ def flag(_id):
 	f.save()
 	return jsonify(flag_id=str(f['_id']))
 	
+def getAllItems(collectionName):
+	collection = connection['ukflood'][collectionName]
+	all_items = list(collection.find())
+	for item in all_items:
+			if '_id' in item:
+				item['_id'] = str(item['_id'])
+			if 'flagID' in item:
+				item['flagID'] = str(item['flagID'])
+	return all_items
+
+@app.route("/admin")
+def admin():
+	if 'user_id' not in session:
+		return redirect(url_for('index'))
+	if session['user_id'] != 'devopstom':
+		return redirect(url_for('index'))
+	else:
+		return render_template("admin.html")
+
+@app.route("/admin/api/user/delete", methods=['POST'])
+def admin_api_user_delete():
+	return jsonify(message="OK!")
+	
+@app.route("/admin/api/users")
+def admin_api_users():
+	if 'user_id' not in session:
+		return redirect(url_for('index'))
+	if session['user_id'] != 'devopstom':
+		return redirect(url_for('index'))
+	else:
+		return jsonify(result=getAllItems("Users"))
+
+@app.route("/admin/api/flags")
+def admin_api_flags():
+	if 'user_id' not in session:
+		return redirect(url_for('index'))
+	if session['user_id'] != 'devopstom':
+		return redirect(url_for('index'))
+	else:
+		return jsonify(result=getAllItems("Flags"))
 
 
 
-		
+@app.route("/admin/api/markers")
+def admin_api_markers():
+	if 'user_id' not in session:
+		return redirect(url_for('index'))
+	if session['user_id'] != 'devopstom':
+		return redirect(url_for('index'))
+	else:
+		return jsonify(result=getAllItems("FloodClosures"))
+
+@app.route("/admin/api/bbc")
+def admin_api_bbc():
+	if 'user_id' not in session:
+		return redirect(url_for('index'))
+	if session['user_id'] != 'devopstom':
+		return redirect(url_for('index'))
+	else:
+		return jsonify(result=getAllItems("BBCTravelItems"))
+
 if __name__ == '__main__':
         app.run(host=BIND_HOST, port=BIND_PORT)
 
