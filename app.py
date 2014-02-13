@@ -10,6 +10,9 @@ from bson.objectid import ObjectId
 import datetime
 import time
 from config import *
+from models import *
+from loader import *
+
 from mongokit import Connection, Document
 
 import requests
@@ -18,6 +21,7 @@ app = Flask(__name__)
 Mobility(app)
 
 app.debug=False
+app.debug=True
 
 import logging
 from logging.handlers import TimedRotatingFileHandler
@@ -59,57 +63,13 @@ twitter = oauth.remote_app(
 )
 def flash(message):
 	print "FLASH ", message
- 
-class FloodClosure(Document):
-	structure = {
-		'owner': unicode,
-		'latitude': float,
-		'longitude': float,
-		'creation_date': datetime.datetime
-		}
-	use_dot_notation = True
-	def __repr__(self):
-		return "<FloodClosure (%s,%s)>" % (self.latitude, self.longitude)
-
-class User(Document):
-	structure = {
-	'screen_name': unicode,
-	'oauth_token': unicode,
-	'oauth_secret': unicode,
-	'creation_date': datetime.datetime,
-	'home_lat': float,
-	'home_long': float,
-	'email': unicode,
-	'verified_reports': int
-	}
-	use_dot_notation = True
-	def __repr__(self):
-		return "<User %s>" % self.screen_name
-
-class BBCTravelItem(Document):
-	structure = {
-		'latitude': float,
-		'longitude': float,
-		'owner': unicode,
-		'severity': unicode,
-		'title': unicode,
-		'summary': unicode,
-		'root_cause': unicode,
-		'object_blob': unicode,
-		'creation_time': datetime.datetime,
-		'import_time': datetime.datetime,
-		'start_time': datetime.datetime,
-		'stop_time': datetime.datetime
-		}
-	use_dot_notation = True
-	def __repr__(self):
-		return "<BBCTravelItem (%s,%s)" % (self.latitude, self.longitude)
 
 
 		
 connection.register([User])
 connection.register([FloodClosure])
 connection.register([BBCTravelItem])
+connection.register([Route])
 
 @app.context_processor
 def inject_values():
@@ -308,50 +268,13 @@ def page_not_found(e):
 def ISR(e):
 	return render_template("500.html"),500
 
+@app.route("/api/bbc/roads/load")
+def api_bbc_roads_load():
+	return loader_bbc_roads()
 
-@app.route("/api/bbc/load")
-def api_bbc_load():
-	connection.ukflood.drop_collection("BBCTravelItems")
-	collection = connection['ukflood'].BBCTravelItems
-	for county in BBC_COUNTIES:
-		u = BBC_TRAVEL + county + "/roads/unplanned.json"
-		try:
-			req = requests.get(u)
-			j = req.json()
-		except:
-			print "Apparently, %s doesn't have any roads.. "% county
-			continue
-		items = j['items']['features']
-		for item in items:
-			bti = collection.BBCTravelItem()
-			bti.latitude = float(item['geometry']['coordinates'][1])
-			bti.longitude = float(item['geometry']['coordinates'][0])
-			bti.owner = unicode(item['properties']['tpegMessage']['originator']['@originator_name'])
-			bti.severity = unicode(item['properties']['tpegMessage']['road_traffic_message']['@severity_factor'])
-			bti.title = unicode(item['properties']['tpegMessage']['title'])
-			bti.summary = unicode(item['properties']['tpegMessage']['summary']['$'])
-			if "obstructions" in item['properties']['tpegMessage']['road_traffic_message']:
-				if 'object' in item['properties']['tpegMessage']['road_traffic_message']['obstructions']:
-					bti.root_cause  = unicode(item['properties']['tpegMessage']['road_traffic_message']['obstructions']['object']['object_problem']['@object_problem'])
-				else:
-					bti.root_cause = u'Unknown'
-			#elif "vehicles" not in item['properties']['tpegMessage']['road_traffic_message']['accidents']:
-			#	bti.root_cause = u"Unknown"
-			#elif "accidents" in item['properties']['tpegMessage']['road_traffic_message']:
-			#	bti.root_cause  = unicode(item['properties']['tpegMessage']['road_traffic_message']['accidents']['vehicles']['vehicle_problem']['@vehicle_problem'])
-			else:
-				bti.root_cause = u"Unknown"
-
-			bti.object_blob = unicode(json.dumps(item))	
-			mgt = item['properties']['tpegMessage']['road_traffic_message']['@message_generation_time']
-			start_time = item['properties']['tpegMessage']['road_traffic_message']['@start_time']
-			stop_time = item['properties']['tpegMessage']['road_traffic_message']['@stop_time'] 	
-			bti.creation_time = datetime.datetime.fromtimestamp(time.mktime(time.strptime(mgt,"%Y-%m-%dT%H:%M:%SZ")))
-			bti.start_time = datetime.datetime.fromtimestamp(time.mktime(time.strptime(start_time,"%Y-%m-%dT%H:%M:%SZ")))
-			bti.stop_time = datetime.datetime.fromtimestamp(time.mktime(time.strptime(stop_time,"%Y-%m-%dT%H:%M:%SZ")))
-			if flood_match.search(bti.root_cause.lower()):
-				bti.save()
-	return jsonify(result="Done")
+@app.route("/api/bbc/trains/load")
+def api_bbc_trains_load():
+	return loader_bbc_trains()
 		
 if __name__ == '__main__':
         app.run(host=BIND_HOST, port=BIND_PORT)
