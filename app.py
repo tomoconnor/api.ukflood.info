@@ -64,9 +64,9 @@ twitter = oauth.remote_app(
 def flash(message):
 	print "FLASH ", message
 
-
 		
 connection.register([User])
+connection.register([Flag])
 connection.register([FloodClosure])
 connection.register([BBCTravelItem])
 connection.register([Route])
@@ -268,6 +268,7 @@ def page_not_found(e):
 def ISR(e):
 	return render_template("500.html"),500
 
+
 @app.route("/api/bbc/roads/load")
 def api_bbc_roads_load():
 	return loader_bbc_roads()
@@ -275,6 +276,23 @@ def api_bbc_roads_load():
 @app.route("/api/bbc/trains/load")
 def api_bbc_trains_load():
 	return loader_bbc_trains()
+
+@app.route("/flag/<_id>")
+def flag(_id):
+	collection = connection['ukflood'].Flags
+	f = collection.Flag()
+	f.flagID = ObjectId(_id)
+	if 'user_id' in session:
+		f.owner = unicode(session['user_id'])
+	else:
+		f.owner = u"Anonymous: " + unicode(request.remote_addr)
+	f.creation_date = datetime.datetime.now()
+	f.save()
+	return jsonify(flag_id=str(f['_id']))
+	
+
+
+
 		
 if __name__ == '__main__':
         app.run(host=BIND_HOST, port=BIND_PORT)
