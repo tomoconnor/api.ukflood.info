@@ -68,3 +68,14 @@ class Route(Document):
 	use_dot_notation = True
 	def __repr__(self):
 		return "<Route from (%s,%s) to (%s,%s)" % (self.start_latitude, self.start_longitude, self.end_latitude,self.end_longitude)
+
+class Flag(Document):
+	structure = {
+		'owner': unicode,
+		'flagID': ObjectId,
+		'creation_date': datetime.datetime
+		}
+	use_dot_notation = True
+	def __repr__(self):
+		return "<Flag %s>" % (self.flagID)
+
