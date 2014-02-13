@@ -70,6 +70,16 @@ class FloodClosure(Document):
 	use_dot_notation = True
 	def __repr__(self):
 		return "<FloodClosure (%s,%s)>" % (self.latitude, self.longitude)
+class Flag(Document):
+	structure = {
+		'owner': unicode,
+		'flagID': ObjectId,
+		'creation_date': datetime.datetime
+		}
+	use_dot_notation = True
+	def __repr__(self):
+		return "<Flag %s>" % (self.flagID)
+
 
 class User(Document):
 	structure = {
@@ -108,6 +118,7 @@ class BBCTravelItem(Document):
 
 		
 connection.register([User])
+connection.register([Flag])
 connection.register([FloodClosure])
 connection.register([BBCTravelItem])
 
@@ -308,6 +319,19 @@ def page_not_found(e):
 def ISR(e):
 	return render_template("500.html"),500
 
+@app.route("/flag/<_id>")
+def flag(_id):
+	collection = connection['ukflood'].Flags
+	f = collection.Flag()
+	f.flagID = ObjectId(_id)
+	if 'user_id' in session:
+		f.owner = unicode(session['user_id'])
+	else:
+		f.owner = u"Anonymous: " + unicode(request.remote_addr)
+	f.creation_date = datetime.datetime.now()
+	f.save()
+	return jsonify(flag_id=str(f['_id']))
+	
 
 @app.route("/api/bbc/load")
 def api_bbc_load():

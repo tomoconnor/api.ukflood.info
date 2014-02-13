@@ -26,6 +26,7 @@ dist/
 eggs/
 lib/
 lib64/
+local/
 parts/
 sdist/
 var/

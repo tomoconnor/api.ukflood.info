@@ -131,10 +131,22 @@ var birmingham = new google.maps.LatLng(52.456009, -1.867676);
 			map: map
 		    });
 		    var infoWindow = new google.maps.InfoWindow({
-			content: "<div class='infobox_content'>" + value.owner + "</div>",
+			content: "<div class='infobox_content'>" + value.owner + "</div>" + 
+			"<div class='infobox_content'> <a class='inappropriate' id='" + value._id + "'>Flag as Inaccurate</a></div>",
 			position: pin_pos
 			});
+		    var thingid = "#" + value._id;
+		    $(document).on("click",thingid, function(evt){
+//			var flag_url = $(evt.target).attr('href');
+			var flag_url = "/flag/" + value._id;
+				$.getJSON(flag_url, function(data){
+					console.log(data);
+					infoWindow.setMap(null);
+					marker.setMap(null);
 
+					
+				});
+			});
 		   google.maps.event.addListener(marker, 'click', function(){
 			   infoWindow.open(map);
 			   map.setCenter(pin_pos);
@@ -193,10 +205,27 @@ function initialize() {
         window.markers[value._id] = marker;
        
 		    var infoWindow = new google.maps.InfoWindow({
-			content: "<div class='infobox_content'>" + value.owner + "</div>",
+			content: "<div class='infobox_content'>" + value.owner + "</div>" + 
+			"<div class='infobox_content'> <a class='inappropriate' id='" + value._id + "'>Flag as Inaccurate</a></div>",
 			position: pin_pos
 			});
+		    var thingid = "#" + value._id;
+		    $(document).on("click",thingid, function(evt){
+//			var flag_url = $(evt.target).attr('href');
+			var flag_url = "/flag/" + value._id;
+				$.getJSON(flag_url, function(data){
+					console.log(data);
+					infoWindow.setMap(null);
+					marker.setMap(null);
+				});
+			});
 
+//		    var infoWindow = new google.maps.InfoWindow({
+//			// content: "<div class='infobox_content'>" + value.owner + "</div>",
+//			content: "<div class='infobox_content'>" + value.owner + "</div>" + "<div class='infobox_content'><a class='inappropriate' href='/flag/" + value._id + "'>Flag as Inaccurate</a></div>",
+//			position: pin_pos
+//			});
+//
 		   google.maps.event.addListener(marker, 'click', function(){
 			   infoWindow.open(map);
 			   map.setCenter(pin_pos);
